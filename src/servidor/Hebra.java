@@ -20,9 +20,11 @@ public class Hebra extends Thread {
     private Socket socketServicio;
     private PrintWriter outPrinter;
     private BufferedReader inReader;
+    private Procesador procesador;
     
     Hebra(ServerSocket s) {
         socketServidor = s;
+        procesador = Procesador.getInstance();
     }
     
     private void atender() {

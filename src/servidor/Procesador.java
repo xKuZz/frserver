@@ -16,8 +16,6 @@ import java.util.HashSet;
 
 public class Procesador {
     private static final HashSet<String> USERS = new HashSet();
-    private static final HashMap<String, InetAddress> IPS = new HashMap();
-    private static final int PORT = 2036;
     
     private static class InstanceHolder {
         private static final Procesador INSTANCE = new Procesador();

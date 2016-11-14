@@ -2,6 +2,7 @@ package servidor;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  * @author Alejandro Campoy Nieves
@@ -12,7 +13,6 @@ import java.net.ServerSocket;
  * peticiones.
  */
 public class Servidor {
-    private static final int NHEBRAS = 6;
     private static final int PORT = 2036;
     static private ServerSocket socketServidor;
     public static void main(String[] args) {
@@ -23,9 +23,14 @@ public class Servidor {
             System.err.println("Error al iniciar servidor en puerto " + PORT);
         }
         
-        for (int i = 0; i < NHEBRAS; ++i) {
-            Hebra h = new Hebra(socketServidor);
-            h.start();
+        while (true) {
+            try {
+                Socket socketServicio = socketServidor.accept();
+                Hebra h = new Hebra(socketServicio);
+                h.start();
+            } catch (IOException io) {
+                System.err.println("Error al iniciar conexión con cliente");
+            } 
         }
     }
     

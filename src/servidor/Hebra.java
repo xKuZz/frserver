@@ -5,7 +5,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
@@ -16,21 +15,18 @@ import java.net.Socket;
  * La clase hebra se encarga de atender las comunicaciones TCP del Servidor
  */
 public class Hebra extends Thread {
-    private final ServerSocket socketServidor;
-    private Socket socketServicio;
+    private final Socket socketServicio;
     private PrintWriter outPrinter;
     private BufferedReader inReader;
     private Procesador procesador;
     
-    Hebra(ServerSocket s) {
-        socketServidor = s;
+    Hebra(Socket s) {
+        socketServicio = s;
         procesador = Procesador.getInstance();
     }
     
     private void atender() {
         try {
-            socketServicio = socketServidor.accept();
-            
             outPrinter = new PrintWriter(socketServicio.getOutputStream(), true);
             inReader = new BufferedReader(new InputStreamReader(socketServicio.getInputStream()));
             
@@ -40,10 +36,11 @@ public class Hebra extends Thread {
             // Procesar petición con Procesador
             String respuesta = "ejemplo";
             
-            // Enviar respuesta
-            outPrinter.println(respuesta);
-            socketServicio.close();
-                    
+            if (respuesta=="Código cerrar conexión")
+                socketServicio.close();
+            else // Enviar respuesta
+                outPrinter.println(respuesta);
+          
                     
         } catch(IOException io) {
             System.err.println("Error al leer/escribir en el socket");
@@ -53,8 +50,7 @@ public class Hebra extends Thread {
     
     @Override
     public void run() {
-        while (true)
+        while (!socketServicio.isClosed())
             atender();
-        
     }
 }

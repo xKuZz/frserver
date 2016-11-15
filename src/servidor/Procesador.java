@@ -11,7 +11,8 @@ import java.util.HashSet;
  * @author David Criado Ramón.
  * 
  * La clase Procesador se encarga de a partir de una petición del cliente generar
- * una respuesta por parte del servidor.
+ * una respuesta por parte del servidor. No envía nada solo genera respuestas y
+ * las coloca en la estructura apropiada si procede.
  */
 
 
@@ -44,9 +45,10 @@ public class Procesador {
         }
     }
     
-    private String sendAll(String message) {
+    private String sendAll(String message, Socket s) {
         for (ArrayList<String> buffer: BUFFERS) {
-            buffer.add(message);
+            String user = SOCKETS.get(s);
+            buffer.add(user + ": " + message);
         }
         return "SENT";
     }
@@ -60,7 +62,7 @@ public class Procesador {
             return addUser(toParse.substring(pos + 1), s);
         
         if ("SEND".equals(accion))
-            return sendAll(toParse.substring(pos + 1));
+            return sendAll(toParse.substring(pos + 1), s);
         
         
         return "UNKNOWN";

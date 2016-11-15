@@ -19,14 +19,21 @@ public class Hebra extends Thread {
     private final Socket socketServicio;
     private PrintWriter outPrinter;
     private BufferedReader inReader;
-    private Procesador procesador;
+    private final Procesador procesador;
     private final ArrayList<String> toSend = new ArrayList();
     
+    /** Constructor de la clase Hebra.
+     * 
+     * @param s Socket del servidor que atiende al cliente.
+     */
     Hebra(Socket s) {
         socketServicio = s;
-        procesador = Procesador.getInstance(toSend);
+        procesador = Procesador.getInstance(socketServicio, toSend);
     }
     
+    /** Método encargado de leer, atender y responder una conexión TCP de un cliente.
+     * 
+     */
     private void atender() {
         try {
             outPrinter = new PrintWriter(socketServicio.getOutputStream(), true);
@@ -63,7 +70,9 @@ public class Hebra extends Thread {
         }
     }
     
-    
+    /** Método de la hebra. Atender la conexión TCP mientras la conexión esta abierta.
+     * 
+     */
     @Override
     public void run() {
         while (!socketServicio.isClosed())

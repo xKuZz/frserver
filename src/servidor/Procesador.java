@@ -1,6 +1,7 @@
 package servidor;
 
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -17,12 +18,18 @@ import java.util.HashSet;
 public class Procesador {
     private static final HashSet<String> USERS = new HashSet();
     private static final HashMap<Socket, String> SOCKETS = new HashMap();
+    private static final ArrayList<ArrayList<String>> BUFFERS = new ArrayList();
+
+    public static HashMap<Socket, String> getSOCKETS() {
+        return SOCKETS;
+    }
     
     private static class InstanceHolder {
         private static final Procesador INSTANCE = new Procesador();
     }
     
-    public static Procesador getInstance() {
+    public static Procesador getInstance(ArrayList<String> buffer) {
+        BUFFERS.add(buffer);
         return InstanceHolder.INSTANCE;
     }
     
@@ -32,16 +39,20 @@ public class Procesador {
             return "INVALIDUSER";
         else {
             USERS.add(user);
-            IPS.put(s, user);
+            SOCKETS.put(s, user);
             return "OK";
         }
     }
     
-    public String sendAll(String text, Socket s ) {
-        Sender s = new Sender(text, s, SOCKETS);
+    private String sendAll(String message) {
+        for (ArrayList<String> buffer: BUFFERS) {
+            buffer.add(message);
+        }
+        return "SENT";
     }
-    
     public String parse(String toParse, Socket s) {
+        if ("UPDATE".equals(toParse))
+            return "UPDATE";
         int pos = toParse.indexOf(' ');
         String accion = toParse.substring(0, pos);
         
@@ -49,7 +60,7 @@ public class Procesador {
             return addUser(toParse.substring(pos + 1), s);
         
         if ("SEND".equals(accion))
-            return sendAll(toParse.substring(pos + 1), s);
+            return sendAll(toParse.substring(pos + 1));
         
         
         return "UNKNOWN";

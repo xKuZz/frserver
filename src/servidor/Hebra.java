@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  *
@@ -19,10 +20,11 @@ public class Hebra extends Thread {
     private PrintWriter outPrinter;
     private BufferedReader inReader;
     private Procesador procesador;
+    private final ArrayList<String> toSend = new ArrayList();
     
     Hebra(Socket s) {
         socketServicio = s;
-        procesador = Procesador.getInstance();
+        procesador = Procesador.getInstance(toSend);
     }
     
     private void atender() {
@@ -38,9 +40,21 @@ public class Hebra extends Thread {
             // Procesar petición con Procesador
             String respuesta = procesador.parse(peticion, socketServicio);
             
-            if (respuesta=="Código cerrar conexión")
+            if ("CLOSE".equals(respuesta))
                 socketServicio.close();
-            else // Enviar respuesta
+            else if ("UPDATE".equals(peticion)) {
+                System.out.println("Recibido " + peticion);
+                // TO-DO: Ampliar leer varias lineas
+                String message;
+                if (!toSend.isEmpty()) 
+                   message = "PUT " + toSend.remove(0);
+                
+                else
+                    message = "IDDLE";
+                System.out.println("Enviado " + message);
+                outPrinter.println(message);
+            }   
+            else
                 outPrinter.println(respuesta);
           
                     

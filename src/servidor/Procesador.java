@@ -28,11 +28,22 @@ public class Procesador {
     // Synchronized para evitar que dos personas pongan el mismo nombre a la vez
     public synchronized String addUser(String user) {
         if (USERS.contains(user))
-            return "Código de error: usuario en uso";
+            return "INVALIDUSER";
         else {
             USERS.add(user);
-            return "Código de inserción correcta";
+            return "OK";
         }
+    }
+    
+    public String parse(String toParse) {
+        int pos = toParse.indexOf(' ');
+        String accion = toParse.substring(0, pos);
+        
+        if ("LOGIN".equals(accion))
+            return addUser(toParse.substring(pos + 1));
+        
+        
+        return "UNKNOWN";
     }
     
     

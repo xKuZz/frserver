@@ -31,10 +31,12 @@ public class Hebra extends Thread {
             inReader = new BufferedReader(new InputStreamReader(socketServicio.getInputStream()));
             
             // Leer petición
-            String peticion;
+            String peticion = inReader.readLine();
+            
+            System.out.println(peticion);
             
             // Procesar petición con Procesador
-            String respuesta = "OK";
+            String respuesta = procesador.parse(peticion);
             
             if (respuesta=="Código cerrar conexión")
                 socketServicio.close();

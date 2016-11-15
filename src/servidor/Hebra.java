@@ -36,7 +36,7 @@ public class Hebra extends Thread {
             System.out.println(peticion);
             
             // Procesar petición con Procesador
-            String respuesta = procesador.parse(peticion);
+            String respuesta = procesador.parse(peticion, socketServicio);
             
             if (respuesta=="Código cerrar conexión")
                 socketServicio.close();

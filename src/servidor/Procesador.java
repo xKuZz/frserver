@@ -59,6 +59,16 @@ public class Procesador {
         else {
             USERS.add(user);
             SOCKETS.put(s, user);
+            
+            ArrayList<String> myBuffer = BUFFERS.get(s);
+            for (Socket socket : SOCKETS.keySet()) {
+                if (socket != s) { // Si no es el mismo usuario
+                    ArrayList<String> buffer = BUFFERS.get(socket);
+                    buffer.add("JOIN " + user);
+                    String oneUser = SOCKETS.get(socket);
+                    myBuffer.add("JOIN " + oneUser);
+                }
+            }
             return "OK";
         }
     }
@@ -75,7 +85,7 @@ public class Procesador {
             if (socket != socketOrigen) {
                 String user = SOCKETS.get(socketOrigen);
                 ArrayList<String> buffer = BUFFERS.get(socket);
-                buffer.add(user + ": " + message);
+                buffer.add("PUT " + user + ": " + message);
             }
         }
         return "SENT";
@@ -88,9 +98,15 @@ public class Procesador {
      */
     public String close(Socket s) {
         String user = SOCKETS.remove(s);
-        BUFFERS.remove(s);
-        USERS.remove(user);
-        return "CLOSE";
+        if (user != null) {
+            for (Socket socket : SOCKETS.keySet()) {
+                    ArrayList<String> buffer = BUFFERS.get(socket);
+                    buffer.add("LEFT " + user);
+            } 
+            BUFFERS.remove(s);
+            USERS.remove(user);
+        }
+        return "BYE";
     }
     
     /** 

@@ -29,6 +29,14 @@ public class Hebra extends Thread {
     Hebra(Socket s) {
         socketServicio = s;
         procesador = Procesador.getInstance(socketServicio, toSend);
+        try {
+            outPrinter = new PrintWriter(socketServicio.getOutputStream(), true);
+            outPrinter.println("HELLO");
+        } catch (IOException ex) {
+            System.err.println(ex);
+            System.err.println("Error al mandar mensaje de bienvenida.");
+        }
+        
     }
     
     /** Método encargado de leer, atender y responder una conexión TCP de un cliente.
@@ -47,22 +55,26 @@ public class Hebra extends Thread {
             // Procesar petición con Procesador
             String respuesta = procesador.parse(peticion, socketServicio);
             
-            if ("CLOSE".equals(respuesta))
+            if ("BYE".equals(respuesta)) {
+                outPrinter.println("BYE");
                 socketServicio.close();
+            }
             else if ("UPDATE".equals(peticion)) {
                 System.out.println("Recibido " + peticion);
-                // TO-DO: Ampliar leer varias lineas
                 String message;
-                if (!toSend.isEmpty()) 
-                   message = "PUT " + toSend.remove(0);
+                while (!toSend.isEmpty()) {
+                   message = toSend.remove(0);
+                   System.out.println("Enviado " + message);
+                    outPrinter.println(message);
+                }
+                outPrinter.println("END");
                 
-                else
-                    message = "IDDLE";
-                System.out.println("Enviado " + message);
-                outPrinter.println(message);
             }   
-            else
+            else {
+                System.out.println(respuesta);
                 outPrinter.println(respuesta);
+            }
+               
           
                     
         } catch(IOException io) {
@@ -70,7 +82,7 @@ public class Hebra extends Thread {
         }
     }
     
-    /** Método de la hebra. Atender la conexión TCP mientras la conexión esta abierta.
+    /** Método de la hebra que atiende la conexión TCP mientras esta abierta.
      * 
      */
     @Override

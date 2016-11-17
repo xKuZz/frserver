@@ -55,7 +55,7 @@ public class Procesador {
      */
     public synchronized String addUser(String user, Socket s) {
         if (USERS.contains(user))
-            return "INVALIDUSER";
+            return "102 INVALIDUSER";
         else {
             USERS.add(user);
             SOCKETS.put(s, user);
@@ -69,7 +69,7 @@ public class Procesador {
                     myBuffer.add("JOIN " + oneUser);
                 }
             }
-            return "OK";
+            return "101 OK";
         }
     }
     
@@ -88,7 +88,7 @@ public class Procesador {
                 buffer.add("PUT " + user + ": " + message);
             }
         }
-        return "SENT";
+        return "301 SENT";
     }
     
     /** 
@@ -106,7 +106,7 @@ public class Procesador {
             BUFFERS.remove(s);
             USERS.remove(user);
         }
-        return "BYE";
+        return "401 BYE";
     }
     
     /** 
@@ -116,22 +116,24 @@ public class Procesador {
      * @return Respuesta del servidor.
      */
     public String parse(String toParse, Socket s) {
-        if ("UPDATE".equals(toParse))
+        if ("200 UPDATE".equals(toParse))
             return "UPDATE";
         
-        if ("CLOSE".equals(toParse))
+        if ("400 CLOSE".equals(toParse))
             return close(s);
         int pos = toParse.indexOf(' ');
+        pos = toParse.indexOf(' ', pos+1);
+        
         String accion = toParse.substring(0, pos);
         
-        if ("LOGIN".equals(accion))
+        if ("100 LOGIN".equals(accion))
             return addUser(toParse.substring(pos + 1), s);
         
-        if ("SEND".equals(accion))
+        if ("300 SEND".equals(accion))
             return sendAll(toParse.substring(pos + 1), s);
         
         
-        return "UNKNOWN";
+        return "000 UNKNOWN";
     }
     
     

@@ -31,7 +31,7 @@ public class Hebra extends Thread {
         procesador = Procesador.getInstance(socketServicio, toSend);
         try {
             outPrinter = new PrintWriter(socketServicio.getOutputStream(), true);
-            outPrinter.println("HELLO");
+            outPrinter.println("50 HELLO");
         } catch (IOException ex) {
             System.err.println(ex);
             System.err.println("Error al mandar mensaje de bienvenida.");
@@ -55,19 +55,19 @@ public class Hebra extends Thread {
             // Procesar petición con Procesador
             String respuesta = procesador.parse(peticion, socketServicio);
             
-            if ("BYE".equals(respuesta)) {
-                outPrinter.println("BYE");
+            if ("401 BYE".equals(respuesta)) {
+                outPrinter.println("401 BYE");
                 socketServicio.close();
             }
-            else if ("UPDATE".equals(peticion)) {
+            else if ("200 UPDATE".equals(peticion)) {
                 System.out.println("Recibido " + peticion);
                 String message;
                 while (!toSend.isEmpty()) {
                    message = toSend.remove(0);
                    System.out.println("Enviado " + message);
-                    outPrinter.println(message);
+                    outPrinter.println("201 " + message);
                 }
-                outPrinter.println("END");
+                outPrinter.println("202 END");
                 
             }   
             else {

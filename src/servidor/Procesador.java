@@ -54,7 +54,7 @@ public class Procesador {
      * @return Respuesta del Servidor.
      */
     public synchronized String addUser(String user, Socket s) {
-        if (USERS.contains(user))
+        if (USERS.contains(user) || "".equals(user.replaceAll(" ", "")))
             return "102 INVALIDUSER";
         else {
             USERS.add(user);

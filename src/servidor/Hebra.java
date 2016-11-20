@@ -49,7 +49,7 @@ public class Hebra extends Thread {
             
             // Leer petición
             String peticion = inReader.readLine();
-            
+            if (peticion == null) return;
             System.out.println(peticion);
             
             // Procesar petición con Procesador
